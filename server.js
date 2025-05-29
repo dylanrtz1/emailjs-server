@@ -13,6 +13,14 @@ const EMAILJS_PUBLIC_KEY = "REzB-c3NtiRv4DmKS";
 app.post("/send-email", async (req, res) => {
   const { email, code } = req.body;
 
+  // Calculamos la hora actual + 15 minutos
+  const now = new Date();
+  const expiration = new Date(now.getTime() + 15 * 60000);
+  const time = expiration.toLocaleTimeString("es-ES", {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
   const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
     method: "POST",
     headers: {
@@ -24,8 +32,9 @@ app.post("/send-email", async (req, res) => {
       template_id: EMAILJS_TEMPLATE_ID,
       user_id: EMAILJS_PUBLIC_KEY,
       template_params: {
-        to_email: email,
-        verification_code: code
+        user_email: email,
+        passcode: code,
+        time: time
       }
     }),
   });
@@ -42,3 +51,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en puerto ${PORT}`);
 });
+
