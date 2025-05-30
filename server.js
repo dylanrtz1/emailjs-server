@@ -32,7 +32,7 @@ app.post("/send-email", async (req, res) => {
         template_id: EMAILJS_TEMPLATE_ID,
         user_id: EMAILJS_PUBLIC_KEY,
         template_params: {
-          user_email: email,
+          to_email: email,
           passcode: code,
           time: time
         }
