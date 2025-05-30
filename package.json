@@ -1,14 +1,14 @@
 {
-  "name": "emailjs-backend",
+  "name": "ly-safety-backend",
   "version": "1.0.0",
-  "description": "Backend para enviar código OTP con EmailJS",
-  "main": "server.js",
   "type": "module",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2"
   }
 }
