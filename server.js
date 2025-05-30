@@ -1,6 +1,6 @@
-// server.js
 import express from "express";
 import cors from "cors";
+import fetch from "node-fetch"; // Importación compatible con ES Modules
 
 const app = express();
 app.use(cors());
@@ -13,18 +13,19 @@ const EMAILJS_PUBLIC_KEY = "REzB-c3NtiRv4DmKS";
 app.post("/send-email", async (req, res) => {
   const { email, code } = req.body;
 
+  // Calculamos la hora actual + 15 minutos
   const now = new Date();
   const expiration = new Date(now.getTime() + 15 * 60000);
   const time = expiration.toLocaleTimeString("es-ES", {
-    hour: '2-digit',
-    minute: '2-digit'
+    hour: "2-digit",
+    minute: "2-digit",
   });
 
   try {
     const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
       method: "POST",
       headers: {
-        "origin": "http://localhost",
+        origin: "http://localhost",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -34,8 +35,8 @@ app.post("/send-email", async (req, res) => {
         template_params: {
           to_email: email,
           passcode: code,
-          time: time
-        }
+          time: time,
+        },
       }),
     });
 
@@ -51,6 +52,7 @@ app.post("/send-email", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor escuchando en puerto ${PORT}`);
 });
