@@ -1,5 +1,4 @@
 const express = require("express");
-const fetch = require("node-fetch");
 const cors = require("cors");
 
 const app = express();
@@ -21,29 +20,33 @@ app.post("/send-email", async (req, res) => {
     minute: '2-digit'
   });
 
-  const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-    method: "POST",
-    headers: {
-      "origin": "http://localhost",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      service_id: EMAILJS_SERVICE_ID,
-      template_id: EMAILJS_TEMPLATE_ID,
-      user_id: EMAILJS_PUBLIC_KEY,
-      template_params: {
-        user_email: email,
-        passcode: code,
-        time: time
-      }
-    }),
-  });
+  try {
+    const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: {
+        "origin": "http://localhost",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        service_id: EMAILJS_SERVICE_ID,
+        template_id: EMAILJS_TEMPLATE_ID,
+        user_id: EMAILJS_PUBLIC_KEY,
+        template_params: {
+          user_email: email,
+          passcode: code,
+          time: time
+        }
+      }),
+    });
 
-  if (response.ok) {
-    res.status(200).json({ message: "Correo enviado con éxito" });
-  } else {
-    const err = await response.text();
-    res.status(500).json({ error: err });
+    if (response.ok) {
+      res.status(200).json({ message: "Correo enviado con éxito" });
+    } else {
+      const err = await response.text();
+      res.status(500).json({ error: err });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -51,4 +54,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en puerto ${PORT}`);
 });
+
 
