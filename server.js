@@ -1,7 +1,6 @@
 // server.js
-const express = require("express");
-const cors = require("cors");
-const fetch = require("node-fetch"); // si usas node 18+, ya viene incluido
+import express from "express";
+import cors from "cors";
 
 const app = express();
 app.use(cors());
@@ -14,7 +13,6 @@ const EMAILJS_PUBLIC_KEY = "REzB-c3NtiRv4DmKS";
 app.post("/send-email", async (req, res) => {
   const { email, code } = req.body;
 
-  // Calcular tiempo de expiración (15 minutos)
   const now = new Date();
   const expiration = new Date(now.getTime() + 15 * 60000);
   const time = expiration.toLocaleTimeString("es-ES", {
