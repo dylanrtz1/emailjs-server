@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import fetch from "node-fetch"; // Importación compatible con ES Modules
+import fetch from "node-fetch";
 
 const app = express();
 app.use(cors());
@@ -11,15 +11,17 @@ const EMAILJS_TEMPLATE_ID = "template_01kqoto";
 const EMAILJS_PUBLIC_KEY = "REzB-c3NtiRv4DmKS";
 
 app.post("/send-email", async (req, res) => {
-  console.log("Body recibido:", req.body); // <--- Aquí imprimes el JSON que te envían
+  console.log("Body recibido:", req.body);
 
-  const { email, code } = req.body;
+  // Extraer email y código del cuerpo (template_params)
+  const email = req.body.template_params?.to_email;
+  const code = req.body.template_params?.user_otp;
 
   if (!email || !code) {
-    return res.status(400).json({ error: "Faltan campos email o code" });
+    return res.status(400).json({ error: "Faltan campos to_email o user_otp en template_params" });
   }
 
-  // Calculamos la hora actual + 15 minutos
+  // Calcular tiempo de expiración (15 minutos más)
   const now = new Date();
   const expiration = new Date(now.getTime() + 15 * 60000);
   const time = expiration.toLocaleTimeString("es-ES", {
@@ -58,7 +60,7 @@ app.post("/send-email", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor escuchando en puerto ${PORT}`);
 });
+
