@@ -15,10 +15,13 @@ app.post("/send-email", async (req, res) => {
 
   // Extraer email y código del cuerpo (template_params)
   const email = req.body.template_params?.to_email;
-  const code = req.body.template_params?.user_otp;
+  const code = req.body.template_params?.passcode; // ✅ Ahora coincide con la plantilla
+
+  console.log("Email recibido antes de enviar a EmailJS:", email); // ✅ Verificación clave
 
   if (!email || !code) {
-    return res.status(400).json({ error: "Faltan campos to_email o user_otp en template_params" });
+    console.log("Error: Faltan campos to_email o passcode");
+    return res.status(400).json({ error: "Faltan campos to_email o passcode en template_params" });
   }
 
   // Calcular tiempo de expiración (15 minutos más)
@@ -48,13 +51,16 @@ app.post("/send-email", async (req, res) => {
       }),
     });
 
+    const responseText = await response.text();
+    console.log("Respuesta de EmailJS:", responseText); // ✅ Capturar cualquier error
+
     if (response.ok) {
       res.status(200).json({ message: "Correo enviado con éxito" });
     } else {
-      const err = await response.text();
-      res.status(500).json({ error: err });
+      res.status(500).json({ error: responseText });
     }
   } catch (error) {
+    console.log("Error en la solicitud a EmailJS:", error.message); // ✅ Capturar excepciones
     res.status(500).json({ error: error.message });
   }
 });
@@ -63,4 +69,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor escuchando en puerto ${PORT}`);
 });
-
