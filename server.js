@@ -11,7 +11,13 @@ const EMAILJS_TEMPLATE_ID = "template_01kqoto";
 const EMAILJS_PUBLIC_KEY = "REzB-c3NtiRv4DmKS";
 
 app.post("/send-email", async (req, res) => {
+  console.log("Body recibido:", req.body); // <--- Aquí imprimes el JSON que te envían
+
   const { email, code } = req.body;
+
+  if (!email || !code) {
+    return res.status(400).json({ error: "Faltan campos email o code" });
+  }
 
   // Calculamos la hora actual + 15 minutos
   const now = new Date();
