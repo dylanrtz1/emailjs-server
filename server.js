@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
+import moment from "moment-timezone";  // ✅ Agregado para manejar zonas horarias correctamente
 
 const app = express();
 app.use(cors());
@@ -15,7 +16,7 @@ app.post("/send-email", async (req, res) => {
 
   // Extraer email y código del cuerpo (template_params)
   const email = req.body.template_params?.to_email;
-  const code = req.body.template_params?.passcode; // ✅ Ahora coincide con la plantilla
+  const code = req.body.template_params?.passcode;
 
   console.log("Email recibido antes de enviar a EmailJS:", email); // ✅ Verificación clave
 
@@ -24,13 +25,9 @@ app.post("/send-email", async (req, res) => {
     return res.status(400).json({ error: "Faltan campos to_email o passcode en template_params" });
   }
 
-  // Calcular tiempo de expiración (15 minutos más)
-  const now = new Date();
-  const expiration = new Date(now.getTime() + 15 * 60000);
-  const time = expiration.toLocaleTimeString("es-ES", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  // ✅ Obtener la hora actual en el huso horario correcto (Ecuador)
+  const now = moment().tz("America/Guayaquil");
+  const expirationTime = now.add(15, "minutes").format("HH:mm");
 
   try {
     const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
@@ -46,7 +43,7 @@ app.post("/send-email", async (req, res) => {
         template_params: {
           to_email: email,
           passcode: code,
-          time: time,
+          expiration_time: expirationTime, // ✅ Ahora envía la hora correcta
         },
       }),
     });
@@ -55,7 +52,7 @@ app.post("/send-email", async (req, res) => {
     console.log("Respuesta de EmailJS:", responseText); // ✅ Capturar cualquier error
 
     if (response.ok) {
-      res.status(200).json({ message: "Correo enviado con éxito" });
+      res.status(200).json({ message: "Correo enviado con éxito", expiration_time: expirationTime });
     } else {
       res.status(500).json({ error: responseText });
     }
