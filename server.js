@@ -16,18 +16,18 @@ app.post("/send-email", async (req, res) => {
 
   // Extraer email y código del cuerpo (template_params)
   const email = req.body.template_params?.to_email;
-  const code = req.body.template_params?.passcode;
+  const code = req.body.template_params?.passcode;  // ✅ Verifica que realmente se envía `passcode`
 
-  console.log("Email recibido antes de enviar a EmailJS:", email); // ✅ Verificación clave
+  console.log("Email recibido antes de enviar a EmailJS:", email);
 
   if (!email || !code) {
     console.log("Error: Faltan campos to_email o passcode");
     return res.status(400).json({ error: "Faltan campos to_email o passcode en template_params" });
   }
 
-  // ✅ Obtener la hora actual en el huso horario correcto (Ecuador)
+  // ✅ Obtener la hora actual en Ecuador y sumar 15 minutos
   const now = moment().tz("America/Guayaquil");
-  const expirationTime = now.add(15, "minutes").format("HH:mm");
+  const expirationTime = now.add(15, "minutes").format("HH:mm");  // ✅ Ajuste correcto de la hora de expiración
 
   try {
     const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
@@ -43,13 +43,13 @@ app.post("/send-email", async (req, res) => {
         template_params: {
           to_email: email,
           passcode: code,
-          expiration_time: expirationTime, // ✅ Ahora envía la hora correcta
+          expiration_time: expirationTime  // ✅ Ahora la hora enviada es correcta
         },
       }),
     });
 
     const responseText = await response.text();
-    console.log("Respuesta de EmailJS:", responseText); // ✅ Capturar cualquier error
+    console.log("Respuesta de EmailJS:", responseText);
 
     if (response.ok) {
       res.status(200).json({ message: "Correo enviado con éxito", expiration_time: expirationTime });
@@ -57,7 +57,7 @@ app.post("/send-email", async (req, res) => {
       res.status(500).json({ error: responseText });
     }
   } catch (error) {
-    console.log("Error en la solicitud a EmailJS:", error.message); // ✅ Capturar excepciones
+    console.log("Error en la solicitud a EmailJS:", error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -66,3 +66,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor escuchando en puerto ${PORT}`);
 });
+
