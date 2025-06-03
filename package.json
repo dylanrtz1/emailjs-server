@@ -10,6 +10,6 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "node-fetch": "^3.3.2",
-    "moment-timezone": "^0.5.40"  // ✅ Agregado para manejar la hora correctamente
+    "moment-timezone": "^0.5.40"
   }
 }
